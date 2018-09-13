@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="col-sm-6">
+    <div class="col-sm-12">
+          <!-- Tab panes -->
+    <div class="tab-content utt">
+    <div role="tabpanel" class="tab-pane active" id="chat_window">
+        {% include 'pages/chat_window.html' %}
+    </div>
+
+</div>
+    </div>
+    <div class="col-sm-6" style="margin-top: 20px;">
+    <video id="video" width="640" height="480" autoplay></video>
+        <!--<canvas id="canvas" width="640" height="480"></canvas>-->
+    </div>
+</div>
+{% endblock %}

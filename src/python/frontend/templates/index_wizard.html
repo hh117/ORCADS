@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block content %}
+ <div class="row">
+    <div class="col-xs-5 col-xs-offset-5">
+        <div class="btn-group" role="group" id="naver" style="margin-left: auto; margin-right: auto;">
+            <!--<a href="#small-talk" type="button" class="change-pane btn btn-primary" data-page="small-talk">Small talk</a>-->
+            <a href="#asr-input" type="button" class="change-pane btn btn-primary" data-page="asr-input">Speak to the robot</a>
+            <!--<button type="button" class="btn btn-default">Gestures</button> -->
+            <!--<button type="button" class="btn btn-default">Head movement</button>-->
+            <!-- <a href="#argue-vote" type="button" class="change-pane btn btn-primary" data-page="argue-vote">Argue & Vote</a>-->
+        </div>
+    </div>
+</div>
+
+<div class="col-sm-6">
+    <div class="col-sm-12">
+          <!-- Tab panes -->
+    <!--<div class="tab-content utt">-->
+        <div role="tabpanel" class="tab-pane" id="asr-input">
+            <!--{% include 'pages/asr-input.html' %}-->
+            <p>User: <em class="user">...</em></p>
+        </div>
+
+    <!-- </div>
+        <div class="col-sm-6" style="margin-top: 20px;">
+            <video id="video" width="640" height="480" autoplay></video>
+            <!--<canvas id="canvas" width="640" height="480"></canvas>
+        </div>
+    </div>
+    -->
+</div>
+
+{% endblock %}

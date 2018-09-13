@@ -1,0 +1,54 @@
+
+file_storage:
+  service_name: 'werewolf'
+  host: '192.168.0.103'
+  port: 139
+
+logging:
+  log_path: '/Users/jdlopes/Sprakkafe/logs'
+
+messaging:
+  broker_host: "localhost"
+  broker_port: 5672
+  broker_user: "jdlopes"
+  broker_pass: "DCKRk020dejd"
+
+  # time server host
+  time_server_host: "tcp://137.195.27.43:45321"
+
+  # connection server
+  connection_server_host: "tcp://CONNECTION SERVER IP ADDRESS:45322"
+
+  # sensor hosts
+  mocap_host: "MOCAP IP ADDRESS"
+
+  # exchanges
+  artificial_agent: "artificial-agent"
+  sensors: "sensors"
+  pre_processing: "pre-processor"
+  environment: "environment"
+  wizard: "wizard"
+  fatima: "fatima"
+  dialogue: "agent"
+
+  # sensors
+  microphone: "microphone"
+  camera: "camera"
+  kinect: "kinect"
+  mocap: "mocap"
+  tobii: "tobii"
+
+  # new sensor
+  new_sensor_mocap: "mocap.new_sensor.all"
+  new_sensor_tobii: "tobii.new_sensor"
+
+  # pre_processing
+  mocap_processing: "mocap.processing"
+  tobii_processing: "tobii.processing"
+  openface: "openface"
+
+  #processors
+  mocaptobii_processing: "mocaptobii.processing"
+  position_data: "position.data"
+  asr_watson: "asr.data"
+  dialogue_acts : "dialogue_act.data"

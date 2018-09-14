@@ -6,6 +6,7 @@ from threading import Thread
 from flask_socketio import SocketIO,emit
 sys.path.append('..')
 from farmi import FarmiUnit,farmi
+import requests
 
 logging.basicConfig(level=logging.INFO)
 
@@ -20,17 +21,22 @@ pub = FarmiUnit('interface', local_save=True, directory_service_ip=FARMI_DIRECTO
 @socketio.on('text')
 def chat(json_chat):
     socketio.emit('message',{'msg':json_chat['msg'],'role':'operator'})
-    socketio.emit('message',{'msg':'I don\'t know','role':'orca_ds'})
+    #socketio.emit('message',{'msg':'I don\'t know','role':'orca_ds'})
+
+@socketio.on('restart')
+def restart():
+    pub.send(({'text': ''},'action.restart'))
+    return 'OK'
 
 
 @app.route('/')
 def index():
     return render_template('index.html',role='user')
 
-@socketio.on('restart')
-def restart():
-    pub.send(({'text': ''},'action.restart'))
-    return 'OK'
+@app.route('/asr')
+def display_asr():
+    socketio.emit('message', {'msg': request.args['msg'], 'role': request.args['role']})
+    return 'ok'
 
 def run():
     logging.info('Interface is up')
@@ -40,7 +46,14 @@ def run():
 
         speaker = data[1].split('.')[2]
         asr_output = json.loads(data[0])
-        socketio.emit('message',{'msg':asr_output['transcript'],'rule':speaker})
+        if 'transcript' in asr_output:
+            print(asr_output['transcript'])
+            requests.get('http://localhost:5000/asr?msg={}&role={}'.format(asr_output['transcript'],speaker))
+            #socketio.emit('message', {'msg': request.args['transcript'], 'role': request.args['role']})
+
+        else:
+            logging.warning('No transcription in message')
+            print(json.dumps(asr_output,indent=2))
 
     print('[*] Waiting for ASR output. To exit press CTRL+C')
     send_asr_interface()

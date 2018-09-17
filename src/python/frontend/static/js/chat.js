@@ -25,12 +25,12 @@ socket.on('waiting', function(data) {
 });
 
 socket.on('message', function(data){
+  console.log(data)
   displayText(data);
 });
 
 function displayText(data) {
   var message = data['msg'];
-  console.log(message);
   if (data['role']=='operator'){
     $('#chat').append('<hgroup class="speech-bubble-right"><p class="text-left" style="font-size:14pt;padding-right: 10px;padding-left: 10px;">'+message+'</p></hgroup>');
   } else if (data['role']=="status"){
@@ -40,4 +40,6 @@ function displayText(data) {
   };
 
   $('#chat').scrollTop($('#chat')[0].scrollHeight);
+  //$('#chat').animate({scrollTop: $('#chat').prop("scrollHeight")}, 500);
+
 }

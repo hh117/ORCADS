@@ -1,0 +1,13 @@
+name: quadcopter
+id: qdc1
+type: aerial
+sensors:
+  - camera
+actions:
+  - fly
+  - picture
+  - video
+base_location:
+  - x:
+  - y:
+  - z:

@@ -1,0 +1,52 @@
+inform_status:
+  robot:
+    - <robot> is available.
+    distance:
+      - <robot> is the <distance> one.
+      - <robot> is <distance_qualifier>
+  battery_level:
+    - Battery level is <level>
+    robot:
+      - <robot> has high battery level
+    high:
+      - fully charged
+  eta:
+    - The ETA is <eta>
+    - ETA is <eta>
+    - ETA is now <eta>
+    robot:
+      - <robot>'s ETA is <eta>
+    object:
+      - ETA for <object> is <eta>
+    location:
+      - ETA for <location> is <eta>
+  moving:
+    location:
+      - <robot> is moving towards <location>
+      - sending <robot> to <location>
+    object:
+      - <robot> is moving towards <object>
+      - sending <robot> to <object>
+  arriving:
+    location:
+      - <robot> has arrived in <location>
+      - <robot> is approaching <location>
+    object:
+      - <robot> has arrived to <object>
+      - <robot> is approaching <object>
+  return_base:
+    - returning <robot> to the base
+  streaming:
+    - <robot> is now streaming
+  connection_resumed:
+    - connection with robot <robot> resumed
+  emergency:
+    fire:
+      location:
+        - there is currently a fire in <location>
+      object:
+        - there is corrently a fire in <object>
+
+
+
+

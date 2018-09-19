@@ -1,0 +1,18 @@
+confirm:
+  accept:
+    - yes
+    - yeah
+    - sure
+    - okay
+    add_on:
+      - I'll do that for you
+  action:
+    - Do you want to <action> with it?
+  robot:
+    - What about <robot>?
+  grounding:
+    - Did you mean <robot>?
+  replace:
+    - Should we send <robot> instead?
+  robot_type:
+    - what type of robot do you want?

@@ -1,0 +1,14 @@
+name: huskey
+id: hsk1
+type: terresterial
+sensors:
+  -
+manipulators:
+  - manipulating arm
+actions:
+  - move
+  - take picture
+base_location:
+  - x:
+  - y:
+  - z:

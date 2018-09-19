@@ -1,0 +1,8 @@
+name: pipe
+id: pipe1
+location:
+  - x:
+  - y:
+  - z:
+radius:
+inspection_type: ground

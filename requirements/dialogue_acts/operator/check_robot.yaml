@@ -1,0 +1,3 @@
+check_robot:
+  distance:
+    - Is that the closest to <object>?

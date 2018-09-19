@@ -1,0 +1,13 @@
+name: gas outlet
+id: gso1
+location:
+  - x:
+  - y:
+  - z:
+radius:
+inspection_type: ground
+objects:
+  - pipe1
+  - sp1
+  - mfld1
+  - wfl1

@@ -1,0 +1,8 @@
+name: sampling point
+id: sp1
+location:
+  - x:
+  - y:
+  - z:
+radius:
+inspection_type: ground

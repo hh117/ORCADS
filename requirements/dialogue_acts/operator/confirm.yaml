@@ -1,0 +1,21 @@
+confirm:
+  accept:
+    - yes
+    - yeah
+    - okay
+    add_on:
+      - that's correct
+      - do that
+      - please do that
+  reject:
+    - no
+    add_on:
+      - thanks
+  robot_type:
+    - I want a <type> robot
+  misson_complete:
+    - fire has been extinguished
+    location:
+      - in <location>
+    object:
+      - in <object>

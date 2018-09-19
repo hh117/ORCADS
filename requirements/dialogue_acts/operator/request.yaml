@@ -1,0 +1,58 @@
+request:
+  robot:
+    - Which robots are available?
+    - What robots are available?
+    location:
+      - which robots are available to send to <location>?
+    skill:
+      - do you have robot that can <skill>?
+  inspection:
+    - The <object> needs to be inspected
+    - <object> is going to be inspected
+    - <object> needs inspection
+  action:
+    intro:
+      - can you
+    send:
+      - Send <robot>
+      - return <robot>
+      location:
+        - to <location>
+        object:
+          - where <object> is located
+      object:
+        - to <object>
+      ref_expr:
+        Send <robot> to <ref_expr>
+        object:
+          - of <object>
+        robot:
+          - of <robot>
+    lookup:
+      intro:
+        - can you
+      robot:
+        - <robot>
+      - take a picture of <object>
+      - take a picture of <object>
+    focus:
+      object:
+        - move <cap_device> to <object>
+        robot:
+          - move <robot> <cap_device> to <object>
+          - point <robot> <cap_device> to <object>
+          - place <robto> <cap_device> in front of <object>
+    video:
+      start:
+        - stream video
+        - send video
+        - can you activate <cap_device>
+      close:
+        - close camera
+        robot:
+          - close <robot> camera
+    start_water:
+      - turn on the wather
+      robot:
+        - <robot>
+

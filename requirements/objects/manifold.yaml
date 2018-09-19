@@ -1,0 +1,8 @@
+name: manifold
+id: mfld1
+location:
+  - x:
+  - y:
+  - z:
+radius:
+inspection_type: ground

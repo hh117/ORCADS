@@ -1,0 +1,7 @@
+inform_error:
+  no_object:
+    - <robot> can't find <object>
+  obstacle:
+    - <robot> found an obstacle on the way
+  lost_connection:
+    - we have lost connection to <robot>

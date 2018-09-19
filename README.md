@@ -9,23 +9,24 @@ It is divided in three blocks:
 *   `dialogue_acts`:
     * `operator`: Dialogue acts produced by robot operator
     * `robot_manager`: Dialogue acts produced by the robot manager (i.e. the system)
-* `objects`: all the objects that exist in the simulated oil rig
+* `objects`: objects that exist in the simulated oil rig as part of landmarks or other objects
+* `landmarks`: landmarks at the simulated oil rig
 * `robots`: all the robots that are available in the simulation
 
-### Objects
+### Landmarks and Objects
 
-Objects are defined like this:
+Landmarks and objects are defined like this:
 
 ```
-name: <name> // object name in natural language
+name: <name> // object or landmark name in natural language
 id: <id> // unique object id
-coordinates: // center coordinates of the object
+coordinates: // center coordinates of the object or landmark
   - x:
   - y:
   - z:
-radius: // spherical area that corresponds to the object
-inspection_type: // how the object is inspected (underwater/ground/aerial)
-objects: // child objects which are part of the main objects
+radius: // spherical area that corresponds to the object or landmark
+inspection_type: // how the object or landmark is inspected (underwater/ground/aerial)
+child_objects: // child objects which are part of the object or landmark
   - <obj_id1>
   - <obj_id2>
   - ...
@@ -57,5 +58,5 @@ TBD
 
 ## Code
 
-`src/python`: Scripts for the interface and the dialogue ORCA dialogue system.
+`src/python`: Scripts for the interface and the ORCA dialogue system.
 

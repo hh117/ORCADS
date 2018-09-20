@@ -7,15 +7,15 @@ The operator has to check the robots available and plan the extinction of the fi
 Expected steps:
 
   1. Check robots available and their capabilities.
-  2. Choose an robot to inspect the fire in order to know which christmas tree(s) are burning and decide the robot best positioned to perform the extiction.
-  3. Based on the robots and their status, send one/several robot to estinguish the fire.
+  2. Choose an robot to inspect the fire in order to know which christmas tree(s) are burning and decide the robot best positioned to perform the extinction.
+  3. Based on the robots and their status, send one/several robot to extinguish the fire.
   4. Extinguish the fire.
   5. Certify that the fire is properly extinguished and the bridge is safe.
 
 Robots available:
-  * 2 aerial robots equiped with cameras.
-  * 1 ground robots equiped with cameras.
-  * 3 ground robots equiped with fire extinguisher.
+  * 2 aerial robots equipped with cameras.
+  * 1 ground robots equipped with cameras.
+  * 3 ground robots equipped with fire extinguisher.
   
 Possible problems:
   * Lost connection to one of the robots with camera.

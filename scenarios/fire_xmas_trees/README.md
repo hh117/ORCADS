@@ -2,7 +2,7 @@
 
 ORCA DS alerts that there is a fire in one of the christmas trees. In the alert the operator is warned that they have to act immediately in order to prevent the fire to spread to bridge that gives access to the living facilities of the platform avoiding an emergency evacuation and casualties.
 
-The operator has to check the robots available and plan the extinction of the fire, in a very short period of times.
+The operator has to check the robots available and plan the extinction of the fire in a given time frame before the evacuation alarm rings.
 
 Expected steps:
 

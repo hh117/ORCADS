@@ -2,7 +2,7 @@
 
 ORCA DS alerts that there is a fire in of the elements of the processing facility. In the alert the operator is warned that they have to act immediately in order to prevent the fire to spread to different parts of the platform avoiding an emergency evacuation.
 
-The operator has to check the robots available and plan the extinction of the fire. 
+The operator has to check the robots available and plan the extinction of the fire before the evacuation alarms rings. 
 
 Expected steps:
 

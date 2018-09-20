@@ -18,10 +18,15 @@ socketio = SocketIO(app)
 FARMI_DIRECTORY_SERVICE_IP = '127.0.0.1'
 pub = FarmiUnit('interface', local_save=True, directory_service_ip=FARMI_DIRECTORY_SERVICE_IP)
 
+test_pic_path = '/static/img/camera_image_uav1_2018-09-18_11-05-03_682253.jpeg'
+
 @socketio.on('text')
 def chat(json_chat):
     socketio.emit('message',{'msg':json_chat['msg'],'role':'operator'})
+    socketio.emit('img', {'path': test_pic_path, 'role': 'orca_ds'})
+    #requests.get('http://localhost:5000/img?path={}&role={}'.format(test_pic_path,'orca_ds'))
     #socketio.emit('message',{'msg':'I don\'t know','role':'orca_ds'})
+    return 'ok'
 
 @socketio.on('restart')
 def restart():
@@ -38,11 +43,16 @@ def display_asr():
     socketio.emit('message', {'msg': request.args['msg'], 'role': request.args['role']})
     return 'ok'
 
+@app.route('/img')
+def send_img():
+    socketio.emit('img',{'path':requests.args['path'],'role': requests.args['role']})
+    return 'ok'
+
 def run():
     logging.info('Interface is up')
 
     @farmi(subscribe='pre-processor', directory_service_ip=FARMI_DIRECTORY_SERVICE_IP)
-    def send_asr_interface(subtopic,time,data):
+    def send_to_interface(subtopic,time,data):
 
         speaker = data[1].split('.')[2]
         asr_output = json.loads(data[0])
@@ -55,8 +65,8 @@ def run():
             logging.warning('No transcription in message')
             print(json.dumps(asr_output,indent=2))
 
-    print('[*] Waiting for ASR output. To exit press CTRL+C')
-    send_asr_interface()
+    print('[*] Waiting for pre-processors. To exit press CTRL+C')
+    send_to_interface()
 
     #@farmi(subscribe='orca_ds',directory_service_ip=FARMI_DIRECTORY_SERVICE_IP)
     #def process_dm_answer(subtopic,time,data):

@@ -54,16 +54,20 @@ def run():
     @farmi(subscribe='pre-processor', directory_service_ip=FARMI_DIRECTORY_SERVICE_IP)
     def send_to_interface(subtopic,time,data):
 
-        speaker = data[1].split('.')[2]
-        asr_output = json.loads(data[0])
-        if 'transcript' in asr_output:
-            print(asr_output['transcript'])
-            requests.get('http://localhost:5000/asr?msg={}&role={}'.format(asr_output['transcript'],speaker))
-            #socketio.emit('message', {'msg': request.args['transcript'], 'role': request.args['role']})
+        data_sender = data[1]
 
-        else:
-            logging.warning('No transcription in message')
-            print(json.dumps(asr_output,indent=2))
+        if 'asr' in data_sender.split('.'):
+
+            speaker = data_sender.split('.')[2]
+            asr_output = json.loads(data[0])
+            if 'transcript' in asr_output:
+                print(asr_output['transcript'])
+                requests.get('http://localhost:5000/asr?msg={}&role={}'.format(asr_output['transcript'],speaker))
+                #socketio.emit('message', {'msg': request.args['transcript'], 'role': request.args['role']})
+
+            else:
+                logging.warning('No transcription in message')
+                print(json.dumps(asr_output,indent=2))
 
     print('[*] Waiting for pre-processors. To exit press CTRL+C')
     send_to_interface()

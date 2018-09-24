@@ -10,7 +10,7 @@ The operator has to perform the inspection of a given part of the rig. The opera
 4. Request data needed (e.g.: picture, video stream, ...)
 5. Return robot to base location.
 
-The mission is considered to be successful if robot has provided the data to the operator and return to the base location.
+The mission is considered to be successful if the robot has provided the data to the operator and returned to the base location.
 
 ### Possible Problems
 

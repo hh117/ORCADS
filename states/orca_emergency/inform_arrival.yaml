@@ -1,0 +1,6 @@
+name: "inform_arrival"
+formulations:
+  - <robot> has arrived to <object>
+  - <robot> is approaching <object>
+transition_states:
+  - inform_streaming

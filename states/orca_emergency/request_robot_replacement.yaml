@@ -1,0 +1,6 @@
+name: "request_robot_replacement"
+formulations:
+  - should <robot> be sent instead?
+transition_states:
+  - inform_moving
+  - request_robot_replacement

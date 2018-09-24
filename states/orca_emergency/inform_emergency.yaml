@@ -1,0 +1,8 @@
+name: "inform_emergency"
+formulations:
+  fire:
+    - there is a fire in <object>
+transition_states:
+ - request_robot_type
+ - db_query
+ - confirm_availability

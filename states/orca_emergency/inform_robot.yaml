@@ -1,0 +1,8 @@
+name: "inform_robot"
+formulations:
+  - <robot> is available
+  - <robot> is the <distance_superlative> one
+  - <robot> is the <distance_superlative> one to <object>
+  - <robot> is <distance_comparative>
+transition_states:
+  - inform_battery_level

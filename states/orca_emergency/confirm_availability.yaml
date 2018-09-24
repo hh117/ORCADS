@@ -1,0 +1,5 @@
+name: "confirm_availability"
+formulations:
+  - <robot> is available
+transition_states:
+  - inform_eta

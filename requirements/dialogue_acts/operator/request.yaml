@@ -1,58 +1,49 @@
 request:
   robot:
-    - Which robots are available?
-    - What robots are available?
-    location:
-      - which robots are available to send to <location>?
-    skill:
-      - do you have robot that can <skill>?
+    - which robots are available *for_that?
+    - what robots are available?
+    - which robots are available to send to <object>?
+    - do we have a robot that <skill>?
+    - do we have a robot <distance>?
   inspection:
-    - The <object> needs to be inspected
+    - the <object> needs to be inspected
     - <object> is going to be inspected
     - <object> needs inspection
-  action:
-    intro:
+  robot_type:
+    - i want a <robot_type> robot
+  send:
+    - send <robot>
+    - return <robot>
+    - move <robot>
+    - add_on:
+      - to <object>
+      - to <object> where <object> is located
+      - <refexpr> *of <object>
+      - <refexpr> *of <object> in <object>
+      - <refexpr> *of <robot>
+    - intro:
       - can you
-    send:
-      - Send <robot>
-      - return <robot>
-      location:
-        - to <location>
-        object:
-          - where <object> is located
-      object:
-        - to <object>
-      ref_expr:
-        Send <robot> to <ref_expr>
-        object:
-          - of <object>
-        robot:
-          - of <robot>
-    lookup:
-      intro:
-        - can you
-      robot:
-        - <robot>
-      - take a picture of <object>
-      - take a picture of <object>
-    focus:
-      object:
-        - move <cap_device> to <object>
-        robot:
-          - move <robot> <cap_device> to <object>
-          - point <robot> <cap_device> to <object>
-          - place <robto> <cap_device> in front of <object>
-    video:
-      start:
-        - stream video
-        - send video
-        - can you activate <cap_device>
-      close:
-        - close camera
-        robot:
-          - close <robot> camera
-    start_water:
-      - turn on the wather
-      robot:
-        - <robot>
+  lookup:
+    - take a picture of <object>
+    - take a picture of <object>
+    - intro:
+      - can *<robot>
+      - <robot>
+  focus:
+    - move <capdev> to <object>
+    - move <robot> <capdev> to <object>
+    - point <robot> <capdev> to <object>
+    - place <robot> <capdev> <ref_exp> <object>
+  video:
+    - start:
+      - stream video
+      - send *the video
+      - can you activate <capdev> *on_<robot>
+    - close:
+      - close <capdev>
+      - close <robot> <capdev>
+  start_water:
+    - turn on the water *on
+    - add_on:
+      - <robot>
 

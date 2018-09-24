@@ -1,0 +1,5 @@
+name: "request_robot_type"
+formulations:
+  - what type of robot do you want?
+transition_states:
+  - db_query

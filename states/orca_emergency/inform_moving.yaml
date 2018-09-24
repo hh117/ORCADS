@@ -1,0 +1,12 @@
+name: "inform_moving"
+formulations:
+  - <robot> is moving towards <object>
+  - sending <robot> to <object>
+  - <robot> is now heading to <object>
+  - returning <robot> to <object>
+  - moving <robot> to <object>
+transition_states:
+  - inform_arrival
+  - inform_lost_connection
+  - infrom_increase_emergency
+  - inform_battery_loss

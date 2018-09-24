@@ -1,18 +1,19 @@
 confirm:
   accept:
-    - yes
+    - 'yes'
     - yeah
     - sure
     - okay
-    add_on:
-      - I'll do that for you
+    - add_on:
+      - i'll do that for you
+      - <robot> is available
   action:
-    - Do you want to <action> with it?
+    - do you want to perform <action> with it?
   robot:
-    - What about <robot>?
+    - what about <robot>?
   grounding:
-    - Did you mean <robot>?
+    - did you mean <object>?
   replace:
-    - Should we send <robot> instead?
+    - should we send <robot> *instead?
   robot_type:
     - what type of robot do you want?

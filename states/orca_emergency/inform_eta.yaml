@@ -1,0 +1,10 @@
+name: "inform_eta"
+formulations:
+  - eta is <eta>
+  - <robot> eta is <eta>
+  - eta at <object> is <eta>
+transition_states:
+  - inform_battery_level
+  - request_robot_type
+  - confirm_availability
+  - request_robot_replacement

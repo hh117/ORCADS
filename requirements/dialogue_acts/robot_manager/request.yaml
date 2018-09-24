@@ -1,3 +1,6 @@
-next_action:
-  - Can I help you with anything else?
-  - Can I help you with anything else right now?
+request:
+  next_action:
+    - can i help you with anything else?
+    - can i help you with anything else right now?
+  robot_type:
+    - what type of robot do you want to send?

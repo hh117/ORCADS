@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block content %}
+<!--<div class="row">
+    <div class="col-xs-5 col-xs-offset-5">
+        <div class="btn-group" role="group" id="naver" style="margin-left: auto; margin-right: auto;">
+            <a href="#keybord-input" type="button" class="change-pane btn btn-primary" data-page="small-talk">Flow utterances</a>
+            <a href="#typed-input" type="button" class="change-pane btn btn-primary" data-page="typed-input">Own utterances</a>
+            <button type="button" class="btn btn-default">Gestures</button>
+            <button type="button" class="btn btn-default">Head movement</button>
+            <a href="#argue-vote" type="button" class="change-pane btn btn-primary" data-page="argue-vote">Argue & Vote</a>
+        </div>
+    </div>
+</div>-->
+
+<div class="col-sm-6">
+    <div class="col-sm-12">
+          <!-- Tab panes -->
+    <div class="tab-content utt">
+    <div role="tabpanel" class="tab-pane active" id="flow-utt">
+        {% include 'pages/flow-utt.html' %}
+    </div>
+    <div class="col-sm-12 attend">
+        <ul class="list-group" id="attend">
+            <li class="list-group-item list_header" style="font-weight: bold">Addressee</li>
+            <li class="list-group-item">Other<span class="badge">N</span></li>
+            <li class="list-group-item">All<span class="badge">V</span></li>
+        </ul>
+    </div>
+
+</div>
+    </div>
+    <div class="col-sm-6" style="margin-top: 20px;">
+    <!--<video id="video" width="640" height="480" autoplay></video>-->
+        <!--<canvas id="canvas" width="640" height="480"></canvas>-->
+    </div>
+</div>
+
+
+
+{% endblock %}

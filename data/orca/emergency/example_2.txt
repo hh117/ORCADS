@@ -1,0 +1,17 @@
+RM: there is currently a fire in <object>
+RM: Do you want me to find the best plan for you or do want to take care of it?
+O: Please tell me the best plan.
+RM: Alright. First send a <robot_type> to <object>
+O: Okay.
+RM: Then stream video from there. Next send <robot> to <object> to extinguish the fire.
+O: Sounds good.
+RM: Finally, you will inform when fire has been extinguished
+O: Okay. Let's start the plan
+RM: Sending <robot> to <object>
+RM: <robot> is now approaching <object>
+RM: <robot> is going to start streaming video from <object>
+RM: <robot> is now approaching <object> from the ground
+RM: <robot> is now going to extinguish the fire
+RM: Please let us know when the fire was been extinguished
+O: The fire has been extinguished successfully
+RM: Great! Returning <robot> to <object>. Returning <robot> to <object>

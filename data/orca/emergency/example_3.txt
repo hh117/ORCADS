@@ -1,0 +1,25 @@
+RM: there is currently a fire in <object>
+RM: Do you want me to find the best plan for you or do want to take care of it?
+O: Please tell me your plan.
+RM: First I need some information regarding the environment to complete the plan.
+O: Okay.
+RM: What is the location of <robot>?
+O: <robot> is close to <object>
+RM: Is there a <robot_type> robot <distance_relative> to <object>?
+O: Yes. <robot> seems to be <distance_relative>.
+RM: Is there an obstacle between where <robot> and <object> on fire?
+O: I'm afraid yes.
+RM: Alright. This is the plan that I suggest. Send <robot> to <object>.
+RM: <robot> will extinguish the fire.
+RM: Then send <robot> to the vincinity of <object> and stream video.
+RM: Finally, you will confirm from the video that the fire has been extinguished
+RM: Do you agree with this plan?
+O: Okay.
+RM: Sending <robot> to <object>
+RM: <robot> is now approaching <object>
+RM: <robot> is now going to extinguish the fire
+RM: <robot> is now approaching <object> the air
+RM: <robot> is going to start streaming video from the fire
+RM: Please let us know when the fire was been extinguished
+O: The fire has been extinguished successfully
+RM: Great! Returning <robot> to <object>. Returning <robot> to <object>

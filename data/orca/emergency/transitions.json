@@ -1,0 +1,62 @@
+{
+  "RM_inform_status(emergency,type=fire)": [
+    "O_request(robot)"
+  ],
+  "O_request(robot)": [
+    "RM_request(robot_type)",
+    "RM_db_call:check_robots",
+    "RM_confirm(accept)"
+  ],
+  "RM_request(robot_type)": [
+    "O_request(robot_type)"
+  ],
+  "O_request(robot_type)": [
+    "RM_db_call:check_robots"
+  ],
+  "RM_db_call:check_robots": [
+    "RM_db_result:{robots:[<robot_1>]}",
+    "RM_db_result:{robots:[<robot_2>,<robot_3>]}"
+  ],
+  "RM_db_result:{robots:[<robot_1>]}": [
+    "RM_inform_status(robot)"
+  ],
+  "RM_inform_status(robot)": [
+    "RM_inform_status(battery_level,level=high)"
+  ],
+  "RM_inform_status(battery_level,level=high)": [
+    "O_request(send)",
+    "RM_inform_status(eta)"
+  ],
+  "O_request(send)": [
+    "RM_inform_status(arriving)",
+    "O_request(start_water)",
+    "O_inform(fire_extinguished)",
+    "O_request(send)"
+  ],
+  "RM_inform_status(arriving)": [
+    "O_request(video,start)",
+    "O_request(send)"
+  ],
+  "O_request(video,start)": [
+    "O_request(robot)"
+  ],
+  "RM_db_result:{robots:[<robot_2>,<robot_3>]}": [
+    "RM_inform_status(robot)"
+  ],
+  "RM_inform_status(eta)": [
+    "O_request(robot)",
+    "RM_inform_status(battery_level)"
+  ],
+  "RM_confirm(accept)": [
+    "RM_inform_status(eta)"
+  ],
+  "RM_inform_status(battery_level)": [
+    "O_request(send)"
+  ],
+  "O_request(start_water)": [
+    "O_request(send)"
+  ],
+  "O_inform(fire_extinguished)": [
+    "O_request(send)"
+  ]
+}

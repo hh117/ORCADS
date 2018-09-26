@@ -1,0 +1,25 @@
+RM: there is currently a fire in <object>
+RM: Do you want me to find the best plan for you or do want to take care of it?
+O: I'll take care of it this time
+RM: Okay
+O: which robots are available to send to <object>
+RM: what type of robot do you want to send?
+O: I want a <robot_type> robot
+RM: db_call:check_robots
+RM: db_result:{robots:[<robot_1>]}
+RM: <robot> is available and fully charged
+O: Send <robot>, <refexpr> <object> in <object>
+RM: <robot> is approaching <object>
+O: Can you activate <capdev> on <robot>?
+O: Do we have a robot that <skill>?
+RM: db_call:check_robots
+RM: db_result:{robots:[<robot_2>,<robot_3>]}
+RM: <robot> is available and fully charged. ETA to <object> is <eta>.
+O: Do we have a robot <distance>?
+RM: Yes, <robot> is available. ETA to <object> is <eta>. Battery level is <level>.
+O: Send <robot>, to <object>
+RM: <robot> is approaching <object>
+O: Can you move <robot>, <refexpr> <robot>?
+O: Turn on the water on, <robot>
+O: Move <robot>, <refexpr> <object>
+O: fire has been extinguished in <object>. Return <robot>, to <object> and return <robot>, to <object>.

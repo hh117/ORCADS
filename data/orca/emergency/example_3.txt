@@ -20,6 +20,6 @@ RM: <robot> is now approaching <object>
 RM: <robot> is now going to extinguish the fire
 RM: <robot> is now approaching <object> the air
 RM: <robot> is going to start streaming video from the fire
-RM: Please let us know when the fire was been extinguished
-O: The fire has been extinguished successfully
+RM: Please say "fire out" when the fire has been extinguished.
+O: Fire out.
 RM: Great! Returning <robot> to <object>. Returning <robot> to <object>

@@ -4,12 +4,16 @@ O: Please tell me your plan.
 RM: I have found <number> plans.
 RM: Plan <number> will send the <robot_type> to <object> and stream video. Then will send the <robot_type> robot to extinguish the fire.
 RM: Plan <number> will send the <robot_type> to <object> to extinguish the fire. Then will send the <robot_type> to stream video.
-O: Let's start plan <number>
+O: What is the advantage of plan <number>?
+RM: Plan <number> provides a clear picture of the fire before the extinction from the <location>.
+O: What about plan <number>?
+RM: Plan <number> is more time effective. The video is streamed from the <location> unlike plan <number>.
+O: Alright. Let's start plan <number>.
 RM: Okay. Sending <robot> to <object>.
 RM: <robot> is approaching <object>
 RM: <robot> is extinguishing the fire
 RM: Sending <robot> to <object>
 RM: <robot> is approaching <object>. Starting video stream.
-RM: Please let us know when the fire has been extinguished.
-O: The fire has been extinguished.
+RM: Please say "fire out" when the fire has been extinguished.
+O: Fire out.
 RM: Great! Sending <robot> to <object>. Sending <robot> to <object>

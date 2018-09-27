@@ -24,11 +24,12 @@ $(document).ready(function() {
 
     socket.on('connect', function(data){
       console.log("connected")
+      //$('#chat').css('background-color','white')
       socket.emit("restart")
     });
 
     window.sendToWizard = function(final_transcript) {
-        socket.emit("say", {"text": final_transcript})
+        socket.emit("say", {"text": final_transcript,"source": 'typed',"state": current_state, "gesture": "", sequence: "False"})
         $(".tab-content .tab-pane").removeClass("active")
         $("#flow-utt").addClass("active")
         current_page = "flow-utt"
@@ -57,6 +58,82 @@ $(document).ready(function() {
       updateSentences(data["sentence"],data["state"],data['current_state'],data["gestures"],data["sequence"]);
     });
 
+    function updateRobotList(robot_names,robot_ids){
+      env_key_array = ['A','S','D','F']
+      var robot_name_env_array = robot_names.split("|")
+      robot_id_env_array = robot_ids.split("|")
+      $('.env').remove()
+      $('#robots-in-env').css('background-color','white')
+      for(var r=0; r < robot_name_env_array.length; r++){
+        $('#list-rbtinenv').append('<li class="list-group-item env">' + robot_name_env_array[r] + '<span class="badge">' + env_key_array[r] + '</span></li>')
+      }
+
+    }
+
+    socket.on('update_robot_list', function(data){
+      updateRobotList(data["robot_name"],data["robot_id"])
+    })
+
+    function updateActiveRobotList(robot_names,robot_ids){
+      active_key_array = ['Z','X','C','V']
+      var robot_name_active_array = robot_names.split("|")
+      robot_id_active_array = robot_ids.split("|")
+      $('.activerobot').remove()
+      $('#robots-in-use').css('background-color','white')
+      for(var r=0; r < robot_name_active_array.length; r++){
+        $('#list-rbtinuse').append('<li class="list-group-item activerobot">' + robot_name_active_array[r] + '<span class="badge">' + active_key_array[r] + '</span></li>')
+      }
+
+    }
+
+    socket.on('activate_robot',function(data){
+      updateActiveRobotList(data["robot_name"],data["robot_id"])
+    })
+
+    socket.on('message', function(data){
+      console.log(data)
+      displayText(data);
+    });
+
+    socket.on('img',function(data){
+      console.log(data);
+      displayImg(data);
+    })
+
+    function displayText(data) {
+      var message = data['msg'];
+      if (data['role']=='operator'){
+        $('#chat').append('<hgroup class="speech-bubble-right"><p class="text-left" style="font-size:14pt;padding-right: 10px;padding-left: 10px;">'+message+'</p></hgroup>');
+      } else if (data['role']=="status"){
+        $('#chat').append('<p style="font-size:12pt;">'+message+'</p>');
+      } else {
+        $('#chat').append('<hgroup class="speech-bubble-left"><p class="text-left" style="font-size:14pt;padding-right: 10px;padding-left: 10px;">'+message+'</p></hgroup>');
+      };
+
+      $('#chat').scrollTop($('#chat')[0].scrollHeight);
+      //$('#chat').animate({scrollTop: $('#chat').prop("scrollHeight")}, 500);
+
+    }
+
+    function displayImg(data) {
+      var loc = window.location.pathname;
+      var dir = loc.substring(0, loc.lastIndexOf('/'));
+      console.log(dir,loc)
+      var img_path = data['path'];
+      if (data['role']=='operator'){
+        $('#chat').append('<hgroup class="speech-bubble-right"><p style="padding-top:0.5em;padding-right:0.5em;padding-left:0.5em;"><img style="max-width: 15em" src='+img_path+'></p></hgroup>');
+      } else if (data['role']=="status"){
+        $('#chat').append('<p><img src='+img_path+'></p>');
+      } else {
+        $('#chat').append('<hgroup class="speech-bubble-left"><p style="padding-top:0.5em;padding-right:0.5em;padding-left:0.5em"><img style="max-width: 15em" src='+img_path+'></p></hgroup>');
+      };
+
+      $('#chat').scrollTop($('#chat')[0].scrollHeight);
+      //$('#chat').animate({scrollTop: $('#chat').prop("scrollHeight")}, 500);
+
+    }
+
+
     function reset() {
         $('.list-group').removeClass('dim');
     }
@@ -65,132 +142,83 @@ $(document).ready(function() {
     var combo = [];
     var stop = false;
     $('html').on('keydown', function(event) {
-        if (stop) return;
-        if ($(event.target).attr('id') === 'name') return true;
-        var keyPressed = event.key.toLowerCase();
-        combo.push(keyPressed);
-        console.log(combo.sort().join('-'))
-
-        if (combo.length == 2) {
-            var modifier = null;
-            if (combo.indexOf('alt') !== -1){
-                modifier = 'support';
-            } else if (combo.indexOf('control') !== -1){
-                modifier = 'defend';
-            } else if (combo.indexOf('shift') !== -1){
-                //console.log(current_page.indexOf('flow-utt'))
-                if(current_page.indexOf('flow-utt') !== -1){
-                    modifier = 'small_talk'
-                }else if(current_page.indexOf('dialog') !== -1){
-                    modifier = 'accuse';
-                }else if(current_page.indexOf('argue-vote')){
-                    modifier = 'kill'
-                }
-            }
-
-            if (modifier) {
-                var participant = combo.filter(item => ['alt', 'control', 'shift','meta'].indexOf(item) === -1)[0]
-                switch(participant) {
-                    case '§':
-                    case '±':
-                      $.get(`/say?text=${modifier}`)
-                      break;
-                    case '0':
-                    case 'º':
-                    case ')':
-                    case '=':
-                    case '≠':
-                      $.get(`/say?text=${modifier}&participant=red`)
-                      break;
-                    case '1':
-                    case '¡':
-                    case '!':
-                    case '':
-                      $.get(`/dialog_act?action=${modifier}&participant=black`)
-                      break;
-                    case '2':
-                    case '™':
-                    case '@':
-                    case '"':
-                      $.get(`/dialog_act?action=${modifier}&participant=brown`)
-                      break;
-                    case '3':
-                    case '£':
-                    case '#':
-                    case '€':
-                      $.get(`/dialog_act?action=${modifier}&participant=orange`)
-                      break;
-                    case '4':
-                    case '¢':
-                    case '$':
-                    case '£':
-                      $.get(`/dialog_act?action=${modifier}&participant=blue`)
-                      break;
-                    case '5':
-                    //case '§':
-                    case '^':
-                    case '%':
-                    case '‰':
-                      $.get(`/dialog_act?action=${modifier}&participant=pink`)
-                      break;
-                    case '6':
-                    case '¶':
-                    case '&':
-                    case '¶':
-                      $.get(`/dialog_act?action=${modifier}&participant=white`)
-                      break;
-                }
-
-            }
-
-        }
-
         console.log(current_page)
-        if ( current_page == 'flow-utt'){
-            switch(combo.sort().join('-')) {
-                case 'y':
-                  socket.emit("say", {"text": "yes", "state": current_state, "gesture": "", sequence: "False"})
-                  break;
-                case 'u':
-                  socket.emit("say", {"text": "no", "state": current_state, "gesture": "", sequence: "False"})
-                  break;
-                case 'i':
-                  socket.emit("say", {"text": "Maybe", "state": current_state, "gesture": "", sequence: "False"})
-                  break;
-                case 'o':
-                  socket.emit("say", {"text": "Mm", "state": current_state, "gesture": "", sequence: "False"})
-                  break;
-                case 'p':
-                  socket.emit("say", {"text": "Mhm", "state": current_state, "gesture": "", sequence: "False"})
-                  break;
-                case 'å':
-                  socket.emit("say", {"text": "I'm not sure", "state": current_state, "gesture": "", sequence: "False"})
-                  break;
-                case 'n':
-                  socket.emit('attend',{"text":"other"})
-                  break;
-                case 'v':
-                  socket.emit('attend',{'text':'all'})
-                  break;
-                case ' ':
-                  socket.emit("say", {"text": "repeat", "state": current_state, "gesture": "", sequence: "False"})
-                  break;
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                  indexUtt = parseInt(combo.sort().join('-'))
-                  if (utterancesGenerated.length > indexUtt-1) {
-                    socket.emit("say",{"text":utterancesGenerated[indexUtt-1],"state":state_array[indexUtt-1],"gesture":gestures_array[indexUtt-1],
-                                        "sequence":sequence_array[indexUtt-1]})
-                  }
-                  break;
+        text = $('#text').val();
+        if ( (current_page == 'flow-utt') && (text.length == 0) ){
+          if (stop) return;
+          if ($(event.target).attr('id') === 'name') return true;
+          var keyPressed = event.key.toLowerCase();
+          combo.push(keyPressed);
+          console.log(combo.sort().join('-'))
+
+          switch(combo.sort().join('-')) {
+              case 'y':
+                socket.emit("say", {"text": "yes", "state": current_state, "gesture": "", sequence: "False", source: "pre-def"})
+                break;
+              case 'u':
+                socket.emit("say", {"text": "no", "state": current_state, "gesture": "", sequence: "False", source: "pre-def"})
+                break;
+              case 'i':
+                socket.emit("say", {"text": "Maybe", "state": current_state, "gesture": "", sequence: "False", source: "pre-def"})
+                break;
+              case 'o':
+                socket.emit("say", {"text": "Mm", "state": current_state, "gesture": "", sequence: "False", source: "pre-def"})
+                break;
+              case 'p':
+                socket.emit("say", {"text": "Mhm", "state": current_state, "gesture": "", sequence: "False", source: "pre-def"})
+                break;
+              case 'å':
+                socket.emit("say", {"text": "I'm not sure", "state": current_state, "gesture": "", sequence: "False", source: "pre-def"})
+                break;
+              case 'n':
+                socket.emit('attend',{"text":"other"})
+                break;
+              case 'v':
+                socket.emit('attend',{'text':'all'})
+                break;
+              case ' ':
+                socket.emit("say", {"text": "repeat", "state": current_state, "gesture": "", sequence: "False", source: "repeat"})
+                break;
+              case '1':
+              case '2':
+              case '3':
+              case '4':
+              case '5':
+              case '6':
+              case '7':
+              case '8':
+              case '9':
+                indexUtt = parseInt(combo.sort().join('-'))
+                if (utterancesGenerated.length > indexUtt-1) {
+                  socket.emit("say",{"text":utterancesGenerated[indexUtt-1],"state":state_array[indexUtt-1],"gesture":gestures_array[indexUtt-1],
+                                      "sequence":sequence_array[indexUtt-1],source: "flow"})
+                }
+                break;
+             case 'a':
+             case 's':
+             case 'd':
+             case 'f':
+                robot_index = env_key_array.indexOf(combo.sort().join('-').toUpperCase())
+                console.log(robot_id_env_array[robot_index])
+                socket.emit("activate_robot",{"robot_id":robot_id_env_array[robot_index]})
+                break;
+             case 'z':
+             case 'x':
+             case 'c':
+             case 'v':
+                 robot_index = active_key_array.indexOf(combo.sort().join('-').toUpperCase())
+                 console.log(robot_id_active_array[robot_index])
+                 socket.emit("deactivate_robot",{"robot_id":robot_id_active_array[robot_index]})
+                 break;
             }
+        } else if (current_page == 'typed-input' || text.length > 0) {
+            var code = event.keyCode || event.which;
+            if (code == 13){
+              text = $('#text').val();
+              $('#text').val('');
+              sendToWizard(text);
+            }
+
         }
     });
 

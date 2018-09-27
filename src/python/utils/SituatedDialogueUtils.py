@@ -1,13 +1,16 @@
 import re
 
-def preProcess(utt,dialogue_config):
+def preProcess(utt,situation_kb,state):
     '''
-    Removes gestures from the sentences before sending them to the wizard interefaces
+    Removes gesture tags from the sentences before sending them to the wizard interface
+    and replaces fields with values from the situation knowledge base
     :param utt:
     :return:
     '''
 
     gesture = []
+
+    da,context = state.split('_',1)
 
     gesture_regex = r'<(.+?)>'
     for gesture_match in re.finditer(gesture_regex,utt):
@@ -20,19 +23,16 @@ def preProcess(utt,dialogue_config):
     matches = re.finditer(curly_braces_regex,utt)
     for match in matches:
         for p in range(len(match.groups())):
-            #if args.furhat:
-            field = match.group(p)
+            matched_field = match.group(p)
+            field = matched_field[1:-1]
+            # there is no field to fill in that space in the knowledge base
+            if field not in situation_kb:
+                return None,''
             # checks input parameters
-            input_parameters = [x for x in field.split('.')]
-            # if the attendee is defined in the parameters set it
-            #print(field)
-            parameter = input_parameters[-1][:-1]
-            if len(input_parameters) > 2:
-                attend = input_parameters[1]
-                utt = re.sub(field, dialogue_config.participants[attend][parameter], utt)
-            elif len(input_parameters) == 2:
-                attend = input_parameters[0][1:0]
-                print(attend, parameter)
-                utt = re.sub(field, dialogue_config.participants[attend][parameter], utt)
+            if context in situation_kb[field]:
+                cntx_filed = situation_kb[field][context]
+            else:
+                print(situation_kb[field])
+            utt = re.sub(matched_field, cntx_filed['name'], utt)
 
     return utt.strip(),';'.join(gesture)

@@ -87,16 +87,23 @@ def find_dialogue_act(utt):
                 for act_name in act:
                     if clean_utt(utt) in act[act_name]:
                         return act_name
+                    else:
+                        for sub_act in act[act_name]:
+                            if type(sub_act) == type({}) and 'sequence' in sub_act:
+                                if clean_utt(utt) in sub_act['sequence']:
+                                    return act_name
+
+
 
     if 'db' in utt.split('_'):
         return utt
-    print(utt,clean_utt(utt))
+    print('No pattern found for utterance: {}'.format(clean_utt(utt)))
     sys.exit()
 
 def get_dialogue_acts(raw_utterance):
 
     utt_da_list = []
-    for utt_act in re.split('\. |and',raw_utterance):
+    for utt_act in re.split('\. |\!',raw_utterance):
         utt_da_list.append(find_dialogue_act(utt_act))
 
     return utt_da_list
@@ -104,12 +111,14 @@ def get_dialogue_acts(raw_utterance):
 def create_dialogue_act_sequence(dialogue):
 
     da_list = []
+    print('Creating dialogue act sequence for {}'.format(dialogue))
     for line in open(dialogue,'r'):
         subject, utterance = line.strip().split(':',1)
         if utterance.strip() == ' ':
             break
         for da in get_dialogue_acts(utterance.strip().lower()):
-            da_list.append(('{}_{}'.format(subject,da)))
+            if subject == args.participant or args.participant == 'all':
+                da_list.append(('{}_{}'.format(subject,da)))
 
     return da_list
 
@@ -119,6 +128,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Extract sequences, transitions and nlu from dialogues')
     parser.add_argument('--dialogue_dir', '-d', type=str, help='directory where the dialogues are stored')
     parser.add_argument('--dialogue_acts', '-da',type=str, help='directory with the dialogue acts definition')
+    parser.add_argument('--participant','-p',type=str, help='filter acts by participant', default='all')
 
     args = parser.parse_args()
 
@@ -130,6 +140,7 @@ if __name__ == "__main__":
             if file.endswith('yaml'):
                 dialogue_acts[root.split(os.sep)[-1]].append(extract_utt_for_acts(os.path.join(root, file)))
 
+    print(json.dumps(dialogue_acts,indent=2))
     dialogues = {}
     for dialogue_file in os.listdir(args.dialogue_dir):
         if dialogue_file.endswith('txt'):
@@ -137,7 +148,6 @@ if __name__ == "__main__":
 
     transitions = {}
     for d in dialogues:
-        print(d)
         for t,turn in enumerate(dialogues[d]):
             if turn not in transitions:
                 transitions[turn] = []

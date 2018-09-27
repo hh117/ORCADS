@@ -1,3 +1,5 @@
+import json
+
 from flask import Flask, render_template, request
 import pika,sys,logging
 from threading import Thread
@@ -20,10 +22,27 @@ silence_threshold = -1.0
 @socketio.on("say")
 def handle_say(json):
     if 'text' in json:
-        pub.send(({'text': json['text'],'state': json['state'], 'gesture': json['gesture'], 'sequence': json['sequence']}, 'action.text'))
+        if 'source' in json and json['source'] == 'typed':
+            socketio.emit('message',{'msg':json['text'],'role':'wizard'})
+        pub.send(({'text': json['text'],'state': json['state'], 'gesture': json['gesture'], 'sequence': json['sequence'], 'source': json['source']}, 'action.text'))
     else:
         print('Empty text string received from the wizard')
         return 'OK'
+
+@socketio.on("activate_robot")
+def activate_robot(json):
+    pub.send((json,'activate.robot'))
+    return 'ok'
+
+@socketio.on("deactivate_robot")
+def activate_robot(json):
+    pub.send((json,'deactivate.robot'))
+    return 'ok'
+
+@app.route('/asr')
+def display_asr():
+    socketio.emit('message', {'msg': request.args['msg'], 'role': request.args['role']})
+    return 'ok'
 
 @app.route('/say')
 def say():
@@ -47,6 +66,16 @@ def emit():
                                            'sequence': request.args['sequence']})
     return 'OK'
 
+@app.route("/update_renv")
+def update_renv():
+    socketio.emit('update_robot_list',{'robot_name':request.args['robot_name'], 'robot_id':request.args['robot_id']})
+    return 'OK'
+
+@app.route("/activate_robot")
+def activate_robot():
+    socketio.emit('activate_robot',{'robot_name':request.args['robot_name'], 'robot_id':request.args['robot_id']})
+    return 'OK'
+
 @app.route("/")
 def index():
     return render_template('index.html')
@@ -61,21 +90,34 @@ def run():
 
         global socketio, silence_threshold
 
-        action = data[1]
+        tag = data[1]
         msg = data[0]
 
-        if action == 'say':
-            logging.debug(msg['text'])
-        elif action == 'furhat.say':
-            for s,sentence in enumerate(msg['text']):
-                logging.debug(u'S: %s [%s]' % (sentence,msg['state'][s]))
-            logging.debug(msg)
-            requests.get('http://localhost:5000/emit?text=%s&state=%s&current_state=%s&gestures=%s&sequence=%s'%(
-                '|'.join(msg['text']),
-                '|'.join(msg['state']),
-                msg['current_state'],
-                '|'.join(msg['gestures']),
-                '|'.join(msg['sequence'])))
+        if 'asr' in tag.split('.'):
+            asr_output = json.loads(data[0])
+            speaker = tag.split('.')[2]
+            if 'transcript' in asr_output:
+                requests.get('http://localhost:5000/asr?msg={}&role={}'.format(asr_output['transcript'], speaker))
+        else:
+            if tag == 'say':
+                logging.debug(msg['text'])
+            elif tag == 'furhat.say':
+                for s,sentence in enumerate(msg['text']):
+                    logging.debug(u'S: %s [%s]' % (sentence,msg['state'][s]))
+                logging.debug(msg)
+                requests.get('http://localhost:5000/emit?text=%s&state=%s&current_state=%s&gestures=%s&sequence=%s'%(
+                    '|'.join(msg['text']),
+                    '|'.join(msg['state']),
+                    msg['current_state'],
+                    '|'.join(msg['gestures']),
+                    '|'.join(msg['sequence'])))
+            elif tag == 'robots.env':
+                requests.get('http://localhost:5000/update_renv?robot_name={}&robot_id={}'.format('|'.join(msg['robot_name']),'|'.join(msg['robot_id'])))
+            elif tag == 'robot.active':
+                requests.get(
+                    'http://localhost:5000/activate_robot?robot_name={}&robot_id={}'.format('|'.join(msg['robot_name']),
+                                                                                         '|'.join(msg['robot_id'])))
+
     print('[*] Waiting for agent\'s messages. To exit press CTRL+C')
     update_wizard()
 

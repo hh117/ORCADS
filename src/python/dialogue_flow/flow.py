@@ -5,7 +5,7 @@ import random
 import yaml
 
 sys.path.append('..')
-from utils import preProcess,DialogueConfig
+from utils import *
 #from DialogueConfig import DialogueConfig
 
 sys.path.append('/Users/jdlopes/multisensoryprocessing/src/python')
@@ -74,24 +74,6 @@ def getCurrentState(utterance):
 
     state_history.append('unknown')
 
-def getAction(_mq, get_shifted_time, routing_key, body):
-
-    if routing_key == 'action.text':
-        if body['text'] == 'repeat':
-            # retrieving last utterance
-            getNextState(utterance_history[-1],body['state'],body['gesture'].split(';'),body['sequence'])
-        elif (body['text'] not in dialogue_config.pre_defined_utt or body['text'] != 'repeat') and body['state'] != 'start' :
-            getNextState(body['text'],body['state'],body['gesture'].split(';'),body['sequence'])
-        else:
-            logging.warning('Predefined utterance cannot be used in state {}'.format(body['state']))
-    elif routing_key == 'action.attend' and args.furhat:
-        changeAttendee(body['text'])
-    elif routing_key == 'action.restart':
-        state_history.clear()
-        getNextState('start')
-        if args.furhat:
-            changeAttendee('all')
-
 def getNextState(utterance,current_state='start',gesture='',sequence='False'):
 
     global state_history
@@ -104,30 +86,21 @@ def getNextState(utterance,current_state='start',gesture='',sequence='False'):
         state_history.append(current_state)
         utterance_history.append(utterance)
         logging.debug('U: {} {}'.format(utterance,gesture))
-        # keep mode activated if utterance was among the predefined utterances
-        if utterance.lower() in dialogue_config.pre_defined_utt:
-            if not states_dict[current_state].sequence:
-                logging.debug('Reactivating the sequence mode for state {}'.format(current_state))
-                states_dict[current_state].sequence = True
-        if sequence == 'True':
-            states_dict[current_state].remove_sequence_utterances(utterance,dialogue_config)
-        if states_dict[current_state].check_sequence():
-            states_dict[current_state].sequence = True
     else:
         # hack that loads the intro sentences when the wizard interface is reloaded
         state_history.append('start')
         intro_state = list((set(states_dict['start'].get_transitions()) - set(['start'])))[0]
         for utt in states_dict[intro_state].get_utterances():
-            utt, gesture = preProcess(utt,dialogue_config)
+            utt, gesture = preProcess(utt,situation_kb,intro_state)
             if utt != None:
                 utteranceList.append(
                     {'utterance': utt, 'state': intro_state, 'gestures': gesture, 'sequence': 'True'})
         if args.wizard:
             sendNBestUttWizard(utteranceList,current_state)
+            sendAvailableRobotsWizard()
             return
         else:
             return utteranceList
-
 
     if args.furhat:
         for g in gesture:
@@ -146,36 +119,15 @@ def getNextState(utterance,current_state='start',gesture='',sequence='False'):
                  furhat_gesture(g.split('.')[1])
         furhat_say(utterance)
 
-    #allowed_transitions = set(states_dict[current_state].get_transitions())
-    allowed_transitions = set(states_dict[current_state].transitions)
-    if len(allowed_transitions) > 2:
-        available_states = list(allowed_transitions.difference(state_history))
-    else:
-        available_states = list(allowed_transitions)
-        for state in available_states:
-            states_dict[state].sequence = False
-            states_dict[state].sequence_used = False
-            states_dict[state].rebuild_sequence()
-
-    logging.debug('Available states {}, current state {}'.format(available_states,current_state))
-
-    # get utterances for the subsequent states
-    if states_dict[current_state].sequence and not states_dict[current_state].sequence_used:
-        sequence_utterances = []
-        for utt in states_dict[current_state].get_utterances():
-            utt, gesture = preProcess(utt,dialogue_config)
-            if utt != None:
-                sequence_utterances.append({'utterance':utt, 'state':current_state, 'gestures': gesture, 'sequence': 'True'})
-        random.shuffle(sequence_utterances) # randomizing utterances for sequence questions to the same state
-        utteranceList += sequence_utterances
+    logging.debug('Available states {}, current state {}'.format(states_dict[current_state].transitions,current_state))
 
     transition_utterances = []
     # get utterances for next states
-    for state in available_states:
+    for state in states_dict[current_state].transitions:
         # checks if the state is defined
         if state in states_dict:
             for utt in states_dict[state].get_utterances():
-                utt, gesture = preProcess(utt,dialogue_config)
+                utt, gesture = preProcess(utt,situation_kb,states_dict[state].name)
                 if utt != None:
                     transition_utterances.append(
                         {'utterance': utt, 'state': state, 'gestures': gesture, 'sequence': 'True'})
@@ -186,54 +138,32 @@ def getNextState(utterance,current_state='start',gesture='',sequence='False'):
 
     if args.wizard:
         sendNBestUttWizard(utteranceList,current_state)
+        sendAvailableRobotsWizard()
     else:
         return utteranceList
 
 def addRandomUtterance(state,curr_state):
-    utt, gest = preProcess(random.choice(states_dict[state].get_utterances()),dialogue_config)
+    utt, gest = preProcess(random.choice(states_dict[state].get_utterances()),situation_kb,curr_state)
     return {'utterance': utt, 'state': curr_state, 'gestures': gest, 'sequence': 'True'}
 
 def addSequenceUtterances(state,curr_state):
     uttList = []
     for uttDef in states_dict[state].get_utterances():
-        utt, gest = preProcess(uttDef,dialogue_config)
+        utt, gest = preProcess(uttDef,situation_kb,states_dict[state].name)
         uttList.append({'utterance': utt, 'state': curr_state, 'gestures': gest, 'sequence': 'True'})
     return uttList
 
 
 def sendNBestUttWizard(utteranceList,current_state):
 
-    if len(utteranceList) < 2 and len(state_history) > 1:
-        utteranceList.append(addRandomUtterance('change_topic','change_topic'))
-        utteranceList.append(addRandomUtterance('end','end'))
-
     # the interface allows no more than 9 utterance to be chosen from
     if len(utteranceList) > 6:
-        if len(state_history) > 30:
-            utteranceList = utteranceList[:5]
-            utteranceList.append(addRandomUtterance('end','end'))
-            logging.debug('inserted end of dialogue utterance')
-        else:
-            utteranceList = utteranceList[:6]
+        utteranceList = utteranceList[:6]
         # add change topic a randomly chosen utterance
-        if state_history[-1] not in ['change_topic','start','intro']:
-            if states_dict['change_topic'].sequence:
-                utteranceList += addSequenceUtterances('change_topic', 'change_topic')
-            else:
-                utteranceList.append(addRandomUtterance('change_topic','change_topic'))
         utteranceData = {'action': 'say', 'text': [d['utterance'] for d in utteranceList], 'state': [d['state'] for d in utteranceList],
                          'current_state': current_state, 'gestures': [d['gestures'] for d in utteranceList], 'sequence': [d['sequence'] for d in utteranceList]}
     else:
         # add change topic a randomly chosen utterance
-        if len(state_history) > 30:
-            if len(utteranceList) == 6:
-                utteranceList = utteranceList[:5]
-            utteranceList.append(addRandomUtterance('end','end'))
-        if state_history[-1] not in ['change_topic', 'start', 'intro']:
-            if states_dict['change_topic'].sequence:
-                utteranceList += addSequenceUtterances('change_topic', 'change_topic')
-            else:
-                utteranceList.append(addRandomUtterance('change_topic','change_topic'))
         utteranceData = {'action': 'say', 'text': [d['utterance'] for d in utteranceList], 'state': [d['state'] for d in utteranceList],
                          'current_state': current_state, 'gestures': [d['gestures'] for d in utteranceList], 'sequence': [d['sequence'] for d in utteranceList]}
 
@@ -241,18 +171,46 @@ def sendNBestUttWizard(utteranceList,current_state):
 
     pub.send((utteranceData,'furhat.say'))
 
+def sendAvailableRobotsWizard():
+
+    robot_data = {'robot_name': [r['name'] for r in robots], 'robot_id': [r['id'] for r in robots]}
+
+    pub.send((robot_data,'robots.env'))
+
+def updateActiveRobotsWizard():
+
+    ids = []
+    names = []
+    for robot in situation_kb['robot']:
+        ids.append(robot['id'])
+        names.append(robot['name'])
+
+    pub.send(({'robot_name': names, 'robot_id': ids}, 'robot.active'))
+
+def is_robot_active(robot_id):
+
+    for r,robot in enumerate(situation_kb['robot']):
+        if robot_id == robot['id']:
+            return r
+
+    return False
+
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Generates dialogues form a set of rules specified in a flow chart')
     parser.add_argument('--wizard', '-w', action='store_true',help='wizard interface')
     parser.add_argument('--states','-s',type=str,help='home dir with the states configuration',required=True)
+    parser.add_argument('--simulation_environment','-se',type=str,help='directory physical environment of the simulated rig',required=True)
+    parser.add_argument('--robot_db','-rdb',type=str,help='directory with the robots available',required=True)
     parser.add_argument('--furhat','-f',action='store_true',default=False,help='a furhat is connected')
     parser.add_argument('--config','-c',type=str,help='file with user data and personality config',required=True)
 
     args = parser.parse_args()
 
     dialogue_config = DialogueConfig(os.path.join(args.config))
+
+    situation_kb = {'objects':{},'robots':{}}
 
     SETTINGS_FILE = os.path.join(dialogue_config.farmi_dir,'settings.yaml')
     settings = yaml.safe_load(open(SETTINGS_FILE, 'r').read())
@@ -271,6 +229,21 @@ if __name__ == "__main__":
 
     #logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO, filename=logfile_name)
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+
+    logging.info('Loading environment')
+    simulation_environment = load_environment(args.simulation_environment)
+    logging.info('Loading robots')
+    robots = load_robots(args.robot_db)
+
+    # there is an emergency
+    if dialogue_config.emergency_location != 'safe':
+        # finding the object from the database
+        emergency_obj = find_obj_env(dialogue_config.emergency_location,simulation_environment)
+        if emergency_obj != None:
+            situation_kb['object'] = {'emergency': emergency_obj}
+        else:
+            logging.error('Object could not be found')
+            sys.exit()
 
     states_dict = {}
     for root,dir,files in os.walk(args.states):
@@ -295,7 +268,9 @@ if __name__ == "__main__":
 
             if routing_key == 'action.text':
                 if body['text'] == 'repeat':
-                    # retrieving last utterance
+                    if len(utterance_history) == 0:
+                        logging.error('No utterance so far')
+                        return
                     getNextState(utterance_history[-1], body['state'], body['gesture'].split(';'), body['sequence'])
                 elif (body['text'] not in dialogue_config.pre_defined_utt or body['text'] != 'repeat') and body[
                     'state'] != 'start':
@@ -309,6 +284,23 @@ if __name__ == "__main__":
                 getNextState('start')
                 if args.furhat:
                     changeAttendee('all')
+            elif routing_key == 'activate.robot':
+                robot_to_activate = get_robot(body['robot_id'],robots)
+                if robot_to_activate == None:
+                    return
+                if 'robot' not in situation_kb:
+                    situation_kb['robot'] = [robot_to_activate]
+                    updateActiveRobotsWizard()
+                else:
+                    if is_robot_active(body['robot_id']):
+                        situation_kb['robot'].append(robot_to_activate)
+                        updateActiveRobotsWizard()
+            elif routing_key == 'deactivate.robot':
+                robot_to_deactivate = is_robot_active(body['robot_id'])
+                if not robot_to_deactivate:
+                    del situation_kb['robot'][robot_to_deactivate]
+                    updateActiveRobotsWizard()
+
         #mq.bind_queue(exchange="wizard",routing_key="*.*",callback=getNextState(current_state,states_dict))
         getAction()
     else:

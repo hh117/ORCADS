@@ -91,10 +91,11 @@ def getNextState(utterance,current_state='start',gesture='',sequence='False'):
         state_history.append('start')
         intro_state = list((set(states_dict['start'].get_transitions()) - set(['start'])))[0]
         for utt in states_dict[intro_state].get_utterances():
-            utt, gesture = preProcess(utt,situation_kb,intro_state)
-            if utt != None:
-                utteranceList.append(
-                    {'utterance': utt, 'state': intro_state, 'gestures': gesture, 'sequence': 'True'})
+            communicative_acts = preProcess(utt,situation_kb,intro_state)
+            if communicative_acts != []:
+                for ca in communicative_acts:
+                    utteranceList.append(
+                        {'utterance': ca['utterance'], 'state': intro_state, 'gestures': ca['gestures'], 'sequence': 'True'})
         if args.wizard:
             sendNBestUttWizard(utteranceList,current_state)
             sendAvailableRobotsWizard()
@@ -121,16 +122,23 @@ def getNextState(utterance,current_state='start',gesture='',sequence='False'):
 
     logging.debug('Available states {}, current state {}'.format(states_dict[current_state].transitions,current_state))
 
+#    if states_dict[current_state].sequnce and not states_dict[current_state].sequence_used:
+#        sequence_utterances = []
+#        for utt in states_dict[current_state].get_utterances():
+#            utt, gesture = preProcess(utt,situation_kb,states_dict[state].name)
+
     transition_utterances = []
     # get utterances for next states
     for state in states_dict[current_state].transitions:
         # checks if the state is defined
         if state in states_dict:
             for utt in states_dict[state].get_utterances():
-                utt, gesture = preProcess(utt,situation_kb,states_dict[state].name)
-                if utt != None:
-                    transition_utterances.append(
-                        {'utterance': utt, 'state': state, 'gestures': gesture, 'sequence': 'True'})
+                communicative_acts = preProcess(utt, situation_kb, states_dict[state].name)
+                print(communicative_acts)
+                if communicative_acts != []:
+                    for ca in communicative_acts:
+                        transition_utterances.append(
+                            {'utterance': ca['utterance'], 'state': state, 'gestures': ca['gestures'], 'sequence': 'True'})
         else:
             logging.error('State {} is not defined'.format(state))
     random.shuffle(transition_utterances) # randomizing utterances corresponding to state transitions
@@ -181,6 +189,7 @@ def updateActiveRobotsWizard():
 
     ids = []
     names = []
+    print(situation_kb)
     for robot in situation_kb['robot']:
         ids.append(robot['id'])
         names.append(robot['name'])
@@ -210,7 +219,7 @@ if __name__ == "__main__":
 
     dialogue_config = DialogueConfig(os.path.join(args.config))
 
-    situation_kb = {'objects':{},'robots':{}}
+    situation_kb = {'object':[]}
 
     SETTINGS_FILE = os.path.join(dialogue_config.farmi_dir,'settings.yaml')
     settings = yaml.safe_load(open(SETTINGS_FILE, 'r').read())
@@ -240,7 +249,7 @@ if __name__ == "__main__":
         # finding the object from the database
         emergency_obj = find_obj_env(dialogue_config.emergency_location,simulation_environment)
         if emergency_obj != None:
-            situation_kb['object'] = {'emergency': emergency_obj}
+            situation_kb['object'].append(emergency_obj)
         else:
             logging.error('Object could not be found')
             sys.exit()
@@ -274,6 +283,7 @@ if __name__ == "__main__":
                     getNextState(utterance_history[-1], body['state'], body['gesture'].split(';'), body['sequence'])
                 elif (body['text'] not in dialogue_config.pre_defined_utt or body['text'] != 'repeat') and body[
                     'state'] != 'start':
+                    logging.debug('{}'.format(body))
                     getNextState(body['text'], body['state'], body['gesture'].split(';'), body['sequence'])
                 else:
                     logging.warning('Predefined utterance cannot be used in state {}'.format(body['state']))
@@ -287,14 +297,14 @@ if __name__ == "__main__":
             elif routing_key == 'activate.robot':
                 robot_to_activate = get_robot(body['robot_id'],robots)
                 if robot_to_activate == None:
+                    logging.warning('Robot could not be found in the environment')
                     return
                 if 'robot' not in situation_kb:
                     situation_kb['robot'] = [robot_to_activate]
                     updateActiveRobotsWizard()
-                else:
-                    if is_robot_active(body['robot_id']):
-                        situation_kb['robot'].append(robot_to_activate)
-                        updateActiveRobotsWizard()
+                elif not is_robot_active(body['robot_id']):
+                    situation_kb['robot'].append(robot_to_activate)
+                    updateActiveRobotsWizard()
             elif routing_key == 'deactivate.robot':
                 robot_to_deactivate = is_robot_active(body['robot_id'])
                 if not robot_to_deactivate:

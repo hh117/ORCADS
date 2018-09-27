@@ -199,8 +199,8 @@ $(document).ready(function() {
              case 'd':
              case 'f':
                 robot_index = env_key_array.indexOf(combo.sort().join('-').toUpperCase())
-                console.log(robot_id_env_array[robot_index])
                 socket.emit("activate_robot",{"robot_id":robot_id_env_array[robot_index]})
+                console.log(robot_id_env_array[robot_index])
                 break;
              case 'z':
              case 'x':

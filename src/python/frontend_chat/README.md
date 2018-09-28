@@ -11,7 +11,7 @@ Web-based chat interface for the ORCA project. It requires the message queue and
 
 ### `static/js`
 
-* `chat.js`: has socket that listen to the messages sent from `chat_interface.py` and prints the speech bubbles in the chat window.
+* `chat.js`: has socket that listens to the messages sent from `chat_interface.py` and prints the speech bubbles in the chat window.
 * `text-input-event.js`: listens to the key strokes and once enter is pressed sends the text contained in the box to `chat_interface.py`.
 
 NOTE: the current version will answer with an image contained in the `img` folder to anything that is written in the text box.

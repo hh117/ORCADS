@@ -1,7 +1,7 @@
 name: "inform_moving"
 formulations:
   - <robot> is moving towards <object>
-  - sending <robot> to <object>
+  - sending <robot> to <object> now
   - <robot> is now heading to <object>
   - returning <robot> to <object>
   - moving <robot> to <object>

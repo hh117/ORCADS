@@ -1,5 +1,5 @@
 name: "db_query"
 formulations:
-  - let me check that up for you
+  - let me check on that for you
 transition_states:
   - inform_robot

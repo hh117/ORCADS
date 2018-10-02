@@ -1,6 +1,6 @@
 name: "inform_increase_emergency"
 formulations:
-  - fire spread to <object>
+  - the ire spread to <object>
 transition_states:
   - inform_robot
   - request_robot_replacement
